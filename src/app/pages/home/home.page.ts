@@ -1,7 +1,5 @@
 import { Component } from '@angular/core';
 import { ActionSheetController, AlertController, LoadingController } from '@ionic/angular';
-import { readTask } from 'ionicons/dist/types/stencil-public-runtime';
-import { from } from 'rxjs';
 import { TarefaService } from 'src/app/services/tarefa.service';
 
 @Component({
@@ -12,19 +10,45 @@ import { TarefaService } from 'src/app/services/tarefa.service';
 export class HomePage {
 
   tarefaCollection: any[] = [];
+  valorTotal: any;
+ 
+  tempoTotalHora: string;
+  tempoTotalMinuto: string;
 
   constructor(
     private alertCtrl: AlertController,
     private tarefaService: TarefaService,
     private actionSheetCtrl: ActionSheetController
   ) { }
-
-  ionViewDidEnter() {
+  
+  ngOnInit() {
     this.listarTarefa();
   }
 
   listarTarefa() {
-    this.tarefaCollection = this.tarefaService.listar();
+  this.tarefaCollection = this.tarefaService.listar();
+  setTimeout(() => {
+    this.totalSomaHoras();
+  }, 1000);
+  }
+
+  totalSomaHoras() {
+    let totalHoras = 0;
+    let totalMinutos = 0;
+
+    this.tarefaCollection.forEach((item) => {
+      if (item.hora != null) {
+        const [hora, minuto] = item.hora.split(":").map(Number);
+        totalHoras += hora;
+        totalMinutos += minuto;
+      }
+    });
+  
+    totalHoras += Math.floor(totalMinutos / 60);
+    totalMinutos %= 60;
+  
+    this.tempoTotalHora = totalHoras.toString().padStart(2, "0");
+    this.tempoTotalMinuto = totalMinutos.toString().padStart(2, "0");
   }
 
   async showAdd() {
@@ -39,15 +63,23 @@ export class HomePage {
           disabled: true
         },
         {
-          name: 'tarefa',
-          type: 'text',
-          placeholder: 'Nome do Produto',
+          name: 'data',
+          type: 'date',
         },
         {
-          name: 'quantidade',
-          type: 'number',
-          placeholder: 'Quantidade',
-        }
+          name: 'descricao',
+          type: 'text',
+          placeholder: 'Descrição',
+        },
+        {
+          name: 'extra',
+          type: 'text',
+          placeholder: 'Hora Extra',
+        },
+        {
+          name: 'hora',
+          type: 'time',
+        },
 
       ],
       buttons: [
@@ -60,12 +92,12 @@ export class HomePage {
         }, {
           text: 'Salvar',
           handler: async (tarefa) => {
-              if(tarefa.quantidade == null || tarefa.quantidade == undefined || tarefa.quantidade == '' ){
-                tarefa.quantidade = 1;
+              if(tarefa.hora == null || tarefa.hora == undefined || tarefa.hora == '' ){
+                tarefa.hora = `00:00`;
               }
-              if(tarefa.tarefa == null || tarefa.tarefa == undefined || tarefa.tarefa == '' ){
+              if(tarefa.data == null || tarefa.data == undefined || tarefa.data == '' ){
                 const actionSheet = this.actionSheetCtrl.create({
-                  header: 'O nome do Produto não pode estar vazio',
+                  header: 'A data não pode ser vazia',
                   mode: 'ios',
                   buttons: [
                     {
@@ -87,10 +119,11 @@ export class HomePage {
       ]
     });
     await alert.present();
+    
   }
   async delete(item) {
     const alert = await this.alertCtrl.create({
-      header: 'Excluir Produto?',
+      header: 'Excluir Data?',
       mode: 'ios',
       buttons: [
         {
@@ -123,15 +156,27 @@ export class HomePage {
           disabled: true
         },
         {
-          name: 'tarefa',
-          type: 'text',
-          value: tarefa.tarefa
+          name: 'data',
+          type: 'date',
+          value: tarefa.data
         },
         {
-          name: 'quantidade',
-          type: 'number',
-          value: tarefa.quantidade,
-        }
+          name: 'descricao',
+          type: 'text',
+          placeholder: 'Descrição',
+          value: tarefa.descricao
+        },
+        {
+          name: 'extra',
+          type: 'text',
+          placeholder: 'Hora Extra',
+          value: tarefa.extra
+        },
+        {
+          name: 'hora',
+          type: 'time',
+          value: tarefa.hora
+        },
       ],
       buttons: [
         {
@@ -153,53 +198,16 @@ export class HomePage {
     await alert.present();
   }
   async openActions(tarefa: any) {
-    if(tarefa.feito == true){
       const actionSheet = await this.actionSheetCtrl.create({
         header: 'O QUE DESEJA FAZER?',
         mode: 'ios',
         buttons: [
           {
-            text: tarefa.feito ? 'Colocar como pendente' : 'Marcar como realizado',
-            icon: tarefa.feito ? 'close-circle' : 'checkmark-circle',
-            handler: () => {
-              tarefa.feito = !tarefa.feito
-  
-              this.tarefaService.atualizar(tarefa, () => {
-                this.listarTarefa();
-              });
-            },
-          },
-          {
-            text: 'Cancelar',
-            icon: 'close',
-            role: 'cancel',
-            handler: () => {
-            }
-          }
-        ],
-      });
-      await actionSheet.present();
-    } else{
-      const actionSheet = await this.actionSheetCtrl.create({
-        header: 'O QUE DESEJA FAZER?',
-        mode: 'ios',
-        buttons: [
-          {
-            text: 'Editar Produto',
+            text: 'Editar Registro',
             icon: 'pencil',
             handler: () => {
               this.editar(tarefa);
-            },
-          },
-          {
-            text: tarefa.feito ? 'Colocar como pendente' : 'Marcar como realizado',
-            icon: tarefa.feito ? 'close-circle' : 'checkmark-circle',
-            handler: () => {
-              tarefa.feito = !tarefa.feito
-  
-              this.tarefaService.atualizar(tarefa, () => {
-                this.listarTarefa();
-              });
+              this.listarTarefa();
             },
           },
           {
@@ -212,12 +220,10 @@ export class HomePage {
         ],
       });
       await actionSheet.present();
-    }
-    
   }
   async showExclusion() {
     const alert = await this.alertCtrl.create({
-      header: 'Excluir Todos Produtos?',
+      header: 'Excluir Todos os Registros?',
       mode: 'ios',
       buttons: [
         {
@@ -281,5 +287,10 @@ export class HomePage {
       ]
     });
     await alerta.present();
+  }
+
+  converteDataParaPadraoBrasileiro(data: string): string {
+    const [ano, mes, dia] = data.split("-");
+    return `${dia}/${mes}/${ano}`;
   }
 }

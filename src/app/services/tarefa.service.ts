@@ -71,14 +71,13 @@ export class TarefaService {
     let value = localStorage.getItem(this.key);
 
     if (value == null || value == undefined) {
-
       return;
     }
 
     let collection: any[] = JSON.parse(value);
 
     let resultCollection = collection.filter(item => {
-      return item.tarefa != tarefa.tarefa
+      return !(JSON.stringify(item) === JSON.stringify(tarefa));
     });
 
     localStorage.setItem(this.key, JSON.stringify(resultCollection));
@@ -122,19 +121,30 @@ export class TarefaService {
       
       collection.forEach(item=>{
 
-
         if(item.codigo == tarefa.codigo){
           
-          if(tarefa.tarefa == null || tarefa.tarefa == ''){
+          if(tarefa.data == null || tarefa.data == ''){
             return;
           }else{
-            item.tarefa = tarefa.tarefa
+            item.data = tarefa.data
           }
 
-          if(tarefa.quantidade == null || tarefa.quantidade == ''){
+          if(tarefa.descricao == null || tarefa.descricao == ''){
             return;
           }else{
-            item.quantidade = tarefa.quantidade
+            item.descricao = tarefa.descricao
+          }
+
+          if(tarefa.extra == null || tarefa.extra == ''){
+            return;
+          }else{
+            item.extra = tarefa.extra
+          }
+
+          if(tarefa.hora == null || tarefa.hora == ''){
+            return;
+          }else{
+            item.hora = tarefa.hora
           }
         
         } 
@@ -160,8 +170,7 @@ export class TarefaService {
       collection.pop();
     }
 
-    collection = [{"codigo":0,"tarefa": null,"quantidade": null,"feito":false}];
-
+    collection = [{codigo: 0, data: null, descricao: null, extra: null, hora:null, feito: null}];
     localStorage.setItem(this.key, JSON.stringify(collection));
 
     if (callback != null) {
@@ -173,7 +182,7 @@ export class TarefaService {
 
     if (value != null || value != undefined) {
       let collection: any[] = JSON.parse(value);
-      collection = [{"codigo":0,"tarefa": null,"quantidade": null,"feito":false}];
+      collection = [{codigo: 0, data: null, descricao: null, extra: null, hora:null, feito: null}];
       localStorage.setItem(this.key, JSON.stringify(collection));
     }
 

@@ -1,7 +1,7 @@
 <ion-header [translucent]="true">
   <ion-toolbar color="primary">
     <ion-title class="animate__animated animate__backInDown">
-      Lista de Compras
+      Ponto de Trabalho da Ingrinha
     </ion-title>
   </ion-toolbar>
 </ion-header>
@@ -9,26 +9,28 @@
 <ion-content [fullscreen]="true">
   <ion-list class="animate__animated animate__bounceInUp">
     <ion-item-sliding *ngFor="let item of tarefaCollection">
-      <ion-item *ngIf="tarefaCollection.length <= 1 && item.tarefa==null">
-        <ion-label>Não há Produtos</ion-label>
+      <ion-item *ngIf="tarefaCollection.length <= 1 && item.descricao==null">
+        <ion-label>Não há Dias</ion-label>
       </ion-item>
-      <ion-item *ngIf="item.tarefa!=null" (click)="openActions(item)">
-        <ion-label>
-            <h2 *ngIf="item.feito==true && item.tarefa!=null"><del><strong>{{item.tarefa}}</strong></del></h2>
-            <h2 *ngIf="item.feito==false && item.tarefa!=null"><strong>{{item.tarefa}}</strong></h2>
-            <p class="text-quantidade" *ngIf="item.feito==false && item.tarefa!=null">Quantidade: {{item.quantidade}}</p>
-            <p class="text-quantidade" *ngIf="item.feito==true && item.tarefa!=null">Quantidade: {{item.quantidade}}</p>
-            <p class="text-p" *ngIf="item.feito==false && item.tarefa!=null">Pendente</p>
-            <p class="text-p" *ngIf="item.feito==true && item.tarefa!=null">Comprado</p>
+      <ion-item *ngIf="item.data!=null" (click)="openActions(item)">
+        <ion-label class="teste">
+            <h2 *ngIf="item.data!=null && item.descricao!=null" class="text"><strong>{{converteDataParaPadraoBrasileiro(item.data)}}</strong></h2>
+            <p class="text-quantidade" *ngIf="item.data!=null && item.descricao!=null">| Descrição: {{item.descricao + ' |'}}</p>
+            <p class="text-quantidade" *ngIf="item.data!=null && item.descricao!=null">Feito Hora: {{item.extra + ' |'}}</p>
+            <p class="text-quantidade" *ngIf="item.data!=null && item.descricao!=null">Hora Extra: {{item.hora + ' |'}}</p>
         </ion-label>
-          <ion-icon slot="start" name="information-circle" color="danger" *ngIf="!item.feito && item.tarefa!=null"></ion-icon>
-          <ion-icon slot="start" name="checkmark-circle" color="success" *ngIf="item.feito && item.tarefa!=null"></ion-icon>
       </ion-item>
-      <ion-item-options side="end" *ngIf="item.tarefa!=null">
+      <ion-item-options side="end" *ngIf="item.data!=null">
         <ion-item-option color="danger" (click)="delete(item)">Excluir</ion-item-option>
       </ion-item-options>
     </ion-item-sliding>
   </ion-list>
+
+  <ion-item >
+    <ion-label>
+      <p>Tempo total de horas extras é de {{ tempoTotalHora + ' horas e ' + tempoTotalMinuto + ' minutos'}}</p>
+    </ion-label>
+  </ion-item>
 
   <!-- fab placed to the top end -->
   <ion-fab vertical="bottom" horizontal="end" vertical="top" slot="fixed">

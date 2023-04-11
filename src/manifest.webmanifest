@@ -1,6 +1,6 @@
 {
-  "name": "Lista de Compras",
-  "short_name": "Lista de Compras",
+  "name": "Registro de Horas",
+  "short_name": "Registro de Horas",
   "theme_color": "#1976d2",
   "background_color": "#fafafa",
   "display": "fullscreen",
@@ -32,20 +32,8 @@
       "purpose": "maskable any"
     },
     {
-      "src": "assets/icons/icon-152x152.png",
-      "sizes": "152x152",
-      "type": "image/png",
-      "purpose": "maskable any"
-    },
-    {
       "src": "assets/icons/icon-192x192.png",
       "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "maskable any"
-    },
-    {
-      "src": "assets/icons/icon-384x384.png",
-      "sizes": "384x384",
       "type": "image/png",
       "purpose": "maskable any"
     }
